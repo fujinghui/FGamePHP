@@ -62,10 +62,8 @@
 			 * 11:第三个游戏闯关成功
 			 * 12:第四个游戏闯关成功
 			 */
-			game_progress = 11;
+			//game_progress = 11;
 			//根据当前游戏进度设置
-			npc_dialog_init();
-			npc_ai_init();
 	
 			//home_scene_enter();
 			//real_time_game_map();
@@ -84,15 +82,18 @@
 				if(isset($_SESSION['login_state']) && $_SESSION['login_state'] == 1)			//用户已经登录
 				{
 				//	echo "alert('".$_SESSION['y']."');\n";
-					echo "game_progress=".$_SESSION['game_progress']."\n";
-					echo "current_scene=".$_SESSION['current_scene']."\n";
-					echo "lead_first_pass.x=".($_SESSION['x']%10000)."\n";
-					echo "lead_first_pass.y=".($_SESSION['y']%10000)."\n";
-					echo "map.x=".floor($_SESSION['x']/10000)."\n";
-					echo "map.y=".floor($_SESSION['y']/10000)."\n";
-					echo $_SESSION['current_scene']."\n";
+					echo "game_progress=".$_SESSION['game_progress'].";\n";
+					echo "current_scene='".$_SESSION['current_scene']."';\n";
+					echo "lead_first_pass.x=".($_SESSION['x']%10000).";\n";
+					echo "lead_first_pass.y=".($_SESSION['y']%10000).";\n";
+					echo "map.x=".floor($_SESSION['x']/10000).";\n";
+					echo "map.y=".floor($_SESSION['y']/10000).";\n";
+					echo $_SESSION['current_scene'].";\n";
 				}
 			?>
+			
+			npc_dialog_init();
+			npc_ai_init();
 			
 			//real_time_game_map();
 			//kekexili_map();
@@ -491,9 +492,20 @@
 			
 			res.push({
 				type:FILE_TYPE_MUSIC,
-				path:'music/background_music.mp3',
+				path:'music/home_scene.mp3',
 				object:null				
 			});
+			res.push({
+				type:FILE_TYPE_MUSIC,
+				path:'music/music_house.mp3',
+				object:null
+			});
+			res.push({
+				type:FILE_TYPE_MUSIC,
+				path:'music/tufu.mp3',
+				object:null
+			});
+			
 			//res.push({
 			//	type:FILE_TYPE_SWF,
 			//	path:'flash/flash.swf',

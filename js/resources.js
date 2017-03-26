@@ -36,7 +36,8 @@ var menu;
 var task;
 var ranklist;
 //音乐资源
-var music_hint, music_backgorund;
+var music_hint, music_home_scene, music_house, music_tufu;
+var musics = new Array();
 function init_all_res(){
 	myajax = new FAjax();
 	ranklist = new RankList();
@@ -842,16 +843,25 @@ function init_all_res(){
 	wall_animal_protect[7].is_reverse = true;
 	wall_animal_protect[7].setRepeatCount(9);
 	
+	//初始化音乐
+	music_hint = new Audio("music/hint.mp3");
+	music_hint.loop = false;
+	music_hint.play();
 	
-	//music_hint = new Audio("music/hint.mp3");
-	//music_hint.loop = false;
-	//music_hint.play();
+	music_home_scene = new Audio("music/home_scene.mp3");
+	music_home_scene.loop = true;
 	
-	music_backgorund = new Audio("music/background_music.mp3");
-	music_backgorund.loop = true;
-	music_backgorund.play();
+	music_house = new Audio("music/music_house.mp3");
+	music_house.loop = true;
+	
+	music_tufu = new Audio("music/tufu.mp3");
+	music_tufu.loop = true;
 	
 	
+	musics[0] = music_hint;
+	musics[1] = music_home_scene;
+	musics[2] = music_house;
+	musics[3] = music_tufu;
 	
 	
 	npc_car = new Npc();
@@ -863,4 +873,11 @@ function init_all_res(){
 	npc_car.center_x = 0; npc_car.center_y = 110;
 	//npc_car.setPosition(100, 600);
 	npc_car.setUpdateTime(300);
+}
+function stop_music(){
+	for(var i = 0; i < musics.length; i ++)
+	{
+		musics[i].pause();
+		musics[i].currentTime = 0;
+	}
 }

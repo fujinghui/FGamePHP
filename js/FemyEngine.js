@@ -2775,6 +2775,7 @@ function Fgame(){
 			{
 				is_enter_animation = false;
 				enter_completion_call_func();				//调用完成函数
+			
 			}
 			else
 			{

@@ -1288,6 +1288,7 @@ function MiniMap(){
 			}
 		}
 	}
+	
 	this.draw = function(context){
 		this.sx = this.SCENE_WIDTH-this.MINI_MAP_WIDTH;
 		this.sy = 0;
@@ -1335,6 +1336,7 @@ function MiniMap(){
 		
 	}
 }
+
 function Scoring(width,height){
 	this.save_animal_count = 0;					//解救的动物数量
 	this.kill_enemy_count = 0;					//杀死的敌人数量
@@ -1348,6 +1350,7 @@ function Scoring(width,height){
 		context.fillText(FRes.String.scoring2+this.save_animal_count, 520, 10+25);
 	}
 }
+
 function RankList(){
 	this.x = 0;
 	this.h = 0;
@@ -1486,6 +1489,8 @@ function Menu(){
 				null,
 				function(text){
 					eval("data="+text);
+					console.log(data);
+					
 					ranklist.play_info= data;
 					for(var i = 0; i < ranklist.play_info.length; i ++)
 					{

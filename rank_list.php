@@ -42,9 +42,9 @@
 		{
 			for(; $i < $index - 1; $i ++)
 			{
-				echo "{id:".$users[$i]->id.",name:".$users[$i]->name.",score1:".$users[$i]->score1.",score2:".$users[$i]->score2.",score3:".$users[$i]->score3."},";		
+				echo "{id:".$users[$i]->id.",name:'".$users[$i]->name."',score1:".$users[$i]->score1.",score2:".$users[$i]->score2.",score3:".$users[$i]->score3."},";		
 			}
-			echo "{id:".$users[$i]->id.",name:".$users[$i]->name.",score1:".$users[$i]->score1.",score2:".$users[$i]->score2.",score3:".$users[$i]->score3."}";		
+			echo "{id:".$users[$i]->id.",name:'".$users[$i]->name."',score1:".$users[$i]->score1.",score2:".$users[$i]->score2.",score3:".$users[$i]->score3."}";		
 		}
 		echo "]";	
 		closeDatabase();					//close database

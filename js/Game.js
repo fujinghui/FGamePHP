@@ -82,7 +82,7 @@ function init_first_pass(){
 	//设置菜单不显示
 	menu.visible = false;
 	
-
+	
 	load_from_server();
 	first_pass_draw();
 }
@@ -136,7 +136,7 @@ function npc_dialog_init(){
 	//初始化
 	//设置主场景里的“老乡”的对话内容
 	npcs_main[3].dialog_text.setWindow({w:canvas.width, h:canvas.height});
-	if(game_progress == 3)			//进度3
+	if(game_progress == 3 || game_progress == 2)			//进度3
 	{
 		npcs_main[3].dialog_text.setText(FRes.String.dialog2.dialog_6);
 	}
@@ -185,6 +185,7 @@ function npc_dialog_init(){
 	npcs_slaughter[0].dialog_text.visible = false;
 	//设置动物保护协会对话内容
 	npcs_animal_protect[0].dialog_text.setWindow({w:canvas.width, h:canvas.height});
+	console.log("game progress:"+game_progress);
 	if(game_progress == 0){				//进度0，玩家刚刚进入游戏
 		npcs_animal_protect[0].dialog_text.setText(FRes.String.dialog2.dialog_1);
 		npcs_animal_protect[0].dialog_text.setCallFunc(function(){
@@ -289,6 +290,7 @@ function home_scene_map(){
 		if(i == 0)					//中国珍稀动物保护协会
 		{
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				animal_protect_house_map();
 			});
 		}
@@ -296,6 +298,7 @@ function home_scene_map(){
 		{
 			//退出场景动画
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				map.x = 100;
 				map.y = 220;
 				lead_first_pass.setPosition(370, 820);
@@ -324,8 +327,9 @@ function home_scene_map(){
 		else if(i == 2)						//安多县的路上
 		{
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				map.x = 0;
-				map.y = 300;
+				map.y = 320;
 				lead_first_pass.setPosition(800, 1000);
 				anduo_road_map();
 			});
@@ -339,13 +343,14 @@ function home_scene_map(){
 	}
 	scene_first_pass.enterScene(function(){
 		
+		music_home_scene.play();
 	});
 }
 //中国野生动物保护协会的房内地图资源
 function animal_protect_house_map(){
 	current_scene = "animal_protect_house_map()";
 	place_name = "珍稀动物保护协会";
-	lead_first_pass.setPosition(0, 350);
+	//lead_first_pass.setPosition(0, 350);
 	map.clear();
 	map.clearTransmitPoint();
 	map.setMapData(map_data_animal_protect_house);
@@ -358,6 +363,7 @@ function animal_protect_house_map(){
 		if(i == 0)
 		{
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				lead_first_pass.setPosition(460, 400);
 				if(game_progress == 2)		//只有当玩家完成了此次的任务之后才会出现一次
 				{
@@ -404,7 +410,9 @@ function animal_protect_house_map(){
 //	flash_game_find.width = canvas.width;
 //	flash_game_find.height =  canvas.height;
 	//flash_game_find.stop();
-	scene_first_pass.enterScene(function(){});
+	scene_first_pass.enterScene(function(){
+		music_house.play();
+	});
 }
 
 
@@ -448,6 +456,7 @@ function slaughter_house_map(){
 	npcs_slaughter[0].setPosition(750, 260);
 	map.addTransmitPoint({x:350, y:800, w:100, h:30, show:true});
 	map.setTransmitPointCallFunc(function(i){
+		stop_music();
 		map.x = 250;
 		map.y = 0;
 		lead_first_pass.setPosition(1050, 510);
@@ -456,7 +465,9 @@ function slaughter_house_map(){
 		});
 	});
 	
-	scene_first_pass.enterScene(function(){});
+	scene_first_pass.enterScene(function(){
+		music_tufu.play();
+	});
 }
 
 
