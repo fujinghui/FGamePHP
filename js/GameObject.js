@@ -1357,6 +1357,8 @@ function RankList(){
 	this.button = new Array();
 	this.image_background; 
 	this.visible = false;
+	this.fontsize = 25;
+	this.show_count = 8;
 	this.init = function(){
 		this.button[0] = new FGAMES.Button("确定");
 		for(var i = 0; i < this.button.length; i ++)
@@ -1373,14 +1375,26 @@ function RankList(){
 		
 		this.image_background = new Image();
 		this.image_background.src = "img/dialog_text_background.png";
-		
 	}
 	this.draw = function(context){
 		if(this.visible == true)
 		{
+			context.font = this.fontsize+"px Arial";
+			context.fillStyle = "rgb(0, 0, 0)";
 			context.drawImage(this.image_background, 0, 0, this.image_background.width, this.image_background.height,
 				this.x, this.y, this.w, this.h
 			);
+			var text = "";
+			var yy = 20, xx = 10;
+			context.fillText("用户名", this.x + xx, this.y + yy);
+			context.fillText("得分", this.x + xx + this.w/2, this.y + yy);
+			yy += this.fontsize;
+			for(var i = 0; i < this.play_info.length && i < this.show_count; i ++)
+			{
+				context.fillText(this.play_info[i].name, this.x + xx, this.y + yy);
+				context.fillText(this.play_info[i].score, this.x + xx + this.w/2, this.y + yy);
+				yy += this.fontsize;
+			}
 			for(var i = 0; i < this.button.length; i ++)
 				this.button[i].visible = true;
 		}
@@ -1466,16 +1480,37 @@ function Menu(){
 		this.button[1].addOnClickListener(function(e){
 			menu.visible = false;
 			ranklist.visible = true;
-			ranklist.paly_info = 0;			//暂无数据
+			ranklist.play_info = 0;			//暂无数据
 			myajax.reader(
-				"RankList",
+				"rank_list.php",
 				null,
 				function(text){
-					ranklist.paly_info = text;
-					console.log(text);
+					eval("data="+text);
+					ranklist.play_info= data;
+					for(var i = 0; i < ranklist.play_info.length; i ++)
+					{
+						ranklist.play_info[i].score = ranklist.play_info[i].score1 + ranklist.play_info[i].score2 + ranklist.play_info[i].score3;
+					}
+					for(var i = 0; i < ranklist.play_info.length; i ++)
+					{
+						for(var j = 0; j < ranklist.play_info.length - i - 1; j ++)
+						{
+							//从大到小
+							if(ranklist.play_info[j].score < ranklist.play_info[j+1].score)
+							{
+								//swp
+								var t = ranklist.play_info[j];
+								ranklist.play_info[j] = ranklist.play_info[j + 1];
+								ranklist.play_info[j + 1] = t;
+							}
+						}
+					}
+					for(var i = 0; i < ranklist.play_info.length; i ++)
+					{
+						console.log(ranklist.play_info[i]);
+					}
 				}
 			);
-			console.log("--");
 		});
 		this.button[2].addOnClickListener(function(e){
 		//	console.log(menu.button[1].enable_music);
@@ -1493,7 +1528,7 @@ function Menu(){
 		//保存游戏
 		this.button[3].addOnClickListener(function(e){
 			myajax.reader(
-			"SaveGame",
+			"save_game.php",
 			"game_progress="+game_progress+"&current_scene="+current_scene+
 			"&x="+(map.x*10000+lead_first_pass.x)+"&y="+(map.y*10000+lead_first_pass.y)+
 			"&score1="+score1+"&score2="+score2+"&score3="+score3,
@@ -1508,7 +1543,7 @@ function Menu(){
 		this.button[4].addOnClickListener(function(e){
 			if(confirm("开始新的游戏后之前的游戏数据将消失，确定要重新开始吗？") == true)
 			myajax.reader(
-				"NewGame",
+				"new_game.php",
 				"",
 				function(text){
 					if(text == "ok")
@@ -1530,8 +1565,8 @@ function Menu(){
 		});
 		//退出游戏
 		this.button[5].addOnClickListener(function(e){
-			myajax.reader("logout.jsp",null,function(text){
-				window.location.href="index.jsp";
+			myajax.reader("logout.php",null,function(text){
+				window.location.href="index.php";
 			});
 		});
 	}

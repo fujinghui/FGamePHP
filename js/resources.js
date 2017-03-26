@@ -843,13 +843,13 @@ function init_all_res(){
 	wall_animal_protect[7].setRepeatCount(9);
 	
 	
-	music_hint = new Audio("music/hint.mp3");
-	music_hint.loop = false;
-	music_hint.play();
+	//music_hint = new Audio("music/hint.mp3");
+	//music_hint.loop = false;
+	//music_hint.play();
 	
-	//music_backgorund = new Audio("music/background_music.mp3");
-	//music_backgorund.loop = true;
-	//music_backgorund.play();
+	music_backgorund = new Audio("music/background_music.mp3");
+	music_backgorund.loop = true;
+	music_backgorund.play();
 	
 	
 	
