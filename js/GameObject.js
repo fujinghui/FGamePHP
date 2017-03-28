@@ -259,6 +259,7 @@ function Task(){
 	this.fontsize = 25;
 	this.button = new Array();
 	this.text = null;
+	
 	this.init = function(){
 		this.button[0] = new FGAMES.Button("确定");
 		this.button[0].setWidth(this.w-20);
@@ -574,14 +575,12 @@ function DialogText(obj){
 		//this.drawRotateRect(context, this.x, this.y, this.w, this.h, 30);
 		context.fillStyle = "rgb(255, 255, 255)";
 		
-		context.font = (this.fontsize+10) + "px Arial";
-		//context.font = (this.fontsize+10)+"px Courier New";
-		//context.font = "italic bold 40px arial,sans-serif";
+		//context.font = (this.fontsize+10) + "px Arial";
+		context.font = "bold "+(this.fontsize+10)+"px KaiTi,sans-serif";
 		context.fillText(this.character_text, this.x, this.y - this.h / 2 - 10);
 		
-		context.font = "bold "+this.fontsize+"px arial,sans-serif";
-		context.font = "italic "+this.fontsize+"px arial,sans-serif";
-		//context.font = this.fontsize + "px Arial";
+		//context.font = "bold "+this.fontsize+"px STKaiti,sans-serif";
+		context.font = "bold "+this.fontsize+"px KaiTi,sans-serif";
 		if(this.text.length * this.fontsize > this.w)
 		{
 			var count = Math.round(this.text.length * this.fontsize / (this.w - this.fontsize) + 0.5);
@@ -1042,6 +1041,7 @@ function Tussle(parent){
 						});
 						this.bullets[this.bullets.length - 1].start_x = this.bullets[this.bullets.length - 1].x;
 						this.bullets[this.bullets.length - 1].start_y = this.bullets[this.bullets.length - 1].y;
+						music_beng.play();		//播放音乐
 					}
 				}
 			}
@@ -1187,6 +1187,7 @@ function LeadCharacter(){
 						this.tussle.bullets[this.tussle.bullets.length - 1].y = this.y-this.center_y+(this.getHeight()-this.tussle.bullet_width)/2;
 						this.tussle.bullets[this.tussle.bullets.length - 1].start_y = this.tussle.bullets[this.tussle.bullets.length-1].y;
 						this.tussle.bullets[this.tussle.bullets.length - 1].angle = -Math.PI / 2;
+						music_beng.play();
 					}
 					else if(this.forward == this.RIGHT)
 					{
@@ -1196,6 +1197,7 @@ function LeadCharacter(){
 						this.tussle.bullets[this.tussle.bullets.length - 1].y = this.y-this.center_y+(this.getHeight()-this.tussle.bullet_width)/2;
 						this.tussle.bullets[this.tussle.bullets.length - 1].start_y = this.tussle.bullets[this.tussle.bullets.length-1].y;
 						this.tussle.bullets[this.tussle.bullets.length - 1].angle = Math.PI / 2;
+						music_beng.play();
 					}
 					else if(this.forward == this.DOWN)
 					{
@@ -1205,6 +1207,7 @@ function LeadCharacter(){
 						this.tussle.bullets[this.tussle.bullets.length - 1].y = this.y-this.center_y+(this.getHeight()-this.tussle.bullet_width)/2;
 						this.tussle.bullets[this.tussle.bullets.length - 1].start_y = this.tussle.bullets[this.tussle.bullets.length - 1].y;
 						this.tussle.bullets[this.tussle.bullets.length - 1].angle = Math.PI;
+						music_beng.play();
 					}
 					else if(this.forward == this.UP)
 					{
@@ -1214,6 +1217,7 @@ function LeadCharacter(){
 						this.tussle.bullets[this.tussle.bullets.length - 1].y = this.y-this.center_y+(this.getHeight()-this.tussle.bullet_width)/2;
 						this.tussle.bullets[this.tussle.bullets.length - 1].start_y = this.tussle.bullets[this.tussle.bullets.length - 1].y;
 						this.tussle.bullets[this.tussle.bullets.length - 1].angle = 1;
+						music_beng.play();
 					}			//没有方向,销毁子弹
 					else{
 						this.tussle.bullets.pop();
@@ -1555,6 +1559,10 @@ function Menu(){
 					{
 						menu.visible = false;
 						scene_first_pass.exitScene(function(){
+							stop_music();
+							score1 = 0;
+							score2 = 0;
+							score3 = 0;
 							game_progress = 0;
 							lead_first_pass.setPosition(0, 530);
 							home_scene_map();

@@ -36,7 +36,7 @@ var menu;
 var task;
 var ranklist;
 //音乐资源
-var music_hint, music_home_scene, music_house, music_tufu;
+var music_hint, music_home_scene, music_house, music_tufu, music_beng;
 var musics = new Array();
 function init_all_res(){
 	myajax = new FAjax();
@@ -59,7 +59,7 @@ function init_all_res(){
 	menu.SCENE_WIDTH = canvas.width;
 	menu.SCENE_HEIGHT = canvas.height;
 	menu.MENU_WIDTH = 200;
-	menu.MENU_HEIGHT = 380;
+	menu.MENU_HEIGHT = 440;
 	menu.x = (menu.SCENE_WIDTH-menu.MENU_WIDTH)/2;
 	menu.y = (menu.SCENE_HEIGHT-menu.MENU_HEIGHT)/2;
 	menu.init();
@@ -856,6 +856,9 @@ function init_all_res(){
 	
 	music_tufu = new Audio("music/tufu.mp3");
 	music_tufu.loop = true;
+	
+	music_beng = new Audio("music/beng.mp3");
+	music_beng.loop = false;
 	
 	
 	musics[0] = music_hint;

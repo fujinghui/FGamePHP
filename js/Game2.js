@@ -134,12 +134,12 @@ function real_time_game_map(){
 				system_dialog.setText(FRes.String.dialog2.dialog_end);
 				system_dialog.visible = true;
 				system_dialog.setCallFunc(function(){
-									//玩家完成了游戏，进入到主界面
+					//玩家完成了游戏，进入到主界面
 					scene_first_pass.exitScene(function(){
 						map.x = 0;
 						map.y = 0;
-							
-							//移除当前场景里的一些（场景）对象
+						stop_music();
+						//移除当前场景里的一些（场景）对象
 						scene_first_pass.removeObject(mini_map);
 						scene_first_pass.removeObject(scoring);
 						scene_first_pass.exitScene(function(){
@@ -154,7 +154,9 @@ function real_time_game_map(){
 	}
 	
 	real_time_npc_ai_init();
-	scene_first_pass.enterScene(function(){});
+	scene_first_pass.enterScene(function(){
+		music_home_scene.play();
+	});
 }
 
 //AI系统

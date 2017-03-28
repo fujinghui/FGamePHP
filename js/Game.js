@@ -86,6 +86,7 @@ function init_first_pass(){
 	load_from_server();
 	first_pass_draw();
 }
+
 function npc_ai_init(){
 	lead_first_pass.setAIShowFrame({
 		left:{start:3, end:5},
@@ -103,7 +104,7 @@ function npc_ai_init(){
 	npcs_main[0].setAIPath([
 		{x:2,y:8,grid_width:map_grid_width,grid_height:map_grid_height},
 		{x:3,y:8},{x:4,y:8},{x:4,y:7}
-		]);
+	]);
 	npcs_main[0].ai_loop_reverse = true;
 	npcs_main[0].ai_loop = true;
 	npcs_main[0].setAIEnable(true);		//开启AI
@@ -139,6 +140,12 @@ function npc_dialog_init(){
 	if(game_progress == 3 || game_progress == 2)			//进度3
 	{
 		npcs_main[3].dialog_text.setText(FRes.String.dialog2.dialog_6);
+		npcs_main[3].dialog_text.setCallFunc(function(){
+			game_progress = 4;
+			npcs_main[3].dialog_text.setText(FRes.String.dialog2.dialog_7);
+			npcs_main[3].dialog_text.setCallFunc(function(){
+			});
+		});
 	}
 	else if(game_progress > 3)
 	{
@@ -149,7 +156,6 @@ function npc_dialog_init(){
 		//不显示对话内容
 		npcs_main[3].dialog_text.setText(null);
 	}
-	
 	//设置屠宰场里的npc对话内容
 	npcs_slaughter[0].dialog_text.setWindow({w:canvas.width, h:canvas.height});
 	npcs_slaughter[0].dialog_text.setText(FRes.String.dialog.dialog_12);
@@ -159,36 +165,16 @@ function npc_dialog_init(){
 		//更改当前屠夫npc的对话内容
 		npcs_slaughter[0].dialog_text.setText(FRes.String.dialog.dialog_9);
 		npcs_slaughter[0].dialog_text.setCallFunc(function(){});
-		
-		npcs_slaughter[12].dialog_text.setWindow({w:canvas.width, h:canvas.height});
-
-		if(game_progress == 4)
-		{
-			npcs_slaughter[12].dialog_text.setText(FRes.String.dialog2.dialog_8);
-			npcs_slaughter[12].dialog_text.setCallFunc(function(){
-				npcs_slaughter[12].dialog_text.setText(FRes.String.dialog2.dialog_9);
-				npcs_slaughter[12].dialog_text.setCallFunc(function(){});
-				game_progress = 5;
-			});
-		}
-		else if(game_progress > 4)
-		{
-			npcs_slaughter[12].dialog_text.setText(FRes.String.dialog2.dialog_9);
-			npcs_slaughter[12].dialog_text.setCallFunc(function(){});
-		}
-		else
-		{
-			npcs_slaughter[12].dialog_text.setText(null);
-		}
 	//});
 	
 	npcs_slaughter[0].dialog_text.visible = false;
 	//设置动物保护协会对话内容
 	npcs_animal_protect[0].dialog_text.setWindow({w:canvas.width, h:canvas.height});
-	console.log("game progress:"+game_progress);
+	//console.log("game progress:"+game_progress);
 	if(game_progress == 0){				//进度0，玩家刚刚进入游戏
 		npcs_animal_protect[0].dialog_text.setText(FRes.String.dialog2.dialog_1);
 		npcs_animal_protect[0].dialog_text.setCallFunc(function(){
+			stop_music();
 			flash_game_find.style.display = "";
 			game_pause = true;
 		});
@@ -208,15 +194,6 @@ function npc_dialog_init(){
 			
 		});
 	}
-	//犯罪分子的对话内容
-	npcs_crime[0].dialog_text.setWindow({w:canvas.width, h:canvas.height});
-	npcs_crime[0].dialog_text.setText([
-		{name:FRes.String.staff, context:" "}
-	]);
-	npcs_crime[0].dialog_text.setCallFunc(function(){
-		flash_game_beng.style.display = "";
-		game_pause = false;
-	});
 	
 	//系统对话框
 //	system_dialog = new DialogText(null);
@@ -227,7 +204,6 @@ function npc_dialog_init(){
 }
 //进入动画
 function home_scene_enter(){
-	console.log("start---------------------ends");
 	map.clear();
 	map.clearTransmitPoint();
 	map.setMapData(map_data_enter);
@@ -270,6 +246,30 @@ function home_scene_map(){
 	map.clearTransmitPoint();
 	map.setMapData(map_data_home1);
 	map.add(npcs_main[3]);
+	
+	if(game_progress == 3 || game_progress == 2)			//进度3
+	{
+		npcs_main[3].dialog_text.setText(FRes.String.dialog2.dialog_6);
+		npcs_main[3].dialog_text.setCallFunc(function(){
+			game_progress = 4;
+			npcs_main[3].dialog_text.setText(FRes.String.dialog2.dialog_7);
+			npcs_main[3].dialog_text.setCallFunc(function(){
+			});
+		});
+	}
+	else if(game_progress > 3)
+	{
+		npcs_main[3].dialog_text.setText(FRes.String.dialog2.dialog_7);
+		npcs_main[3].dialog_text.setCallFunc(function(){
+			
+		});
+	}
+	else
+	{
+		//不显示对话内容
+		npcs_main[3].dialog_text.setText(null);
+	}
+	
 	//添加树木
 	for(var i = 0; i < trees.length; i += 1)
 		map.add(trees[i]);
@@ -290,6 +290,7 @@ function home_scene_map(){
 		if(i == 0)					//中国珍稀动物保护协会
 		{
 			scene_first_pass.exitScene(function(){
+				lead_first_pass.setPosition(0, 350);
 				stop_music();
 				animal_protect_house_map();
 			});
@@ -397,8 +398,7 @@ function animal_protect_house_map(){
 	wall_animal_protect[0].setRepeatCount(Math.round(map_data_animal_protect_house[0].length * map_grid_width / wall_animal_protect[0].getWidth() + 0.5));
 	wall_animal_protect[5].setRepeatCount(wall_animal_protect[0].getRepeatCount());
 	wall_animal_protect[5].setPosition(0, map_data_animal_protect_house.length * map_grid_width-wall_animal_protect[5].getHeight()+30);
-
-
+	
 	wall_animal_protect[6].setPosition(0, map_data_animal_protect_house.length * map_grid_height);
 	wall_animal_protect[7].setPosition(map_data_animal_protect_house[0].length * map_grid_width-wall_animal_protect[7].getWidth(), map_data_animal_protect_house.length * map_grid_height);
 	//设置右边的墙的位置
@@ -410,6 +410,34 @@ function animal_protect_house_map(){
 //	flash_game_find.width = canvas.width;
 //	flash_game_find.height =  canvas.height;
 	//flash_game_find.stop();
+	
+	//设置动物保护协会对话内容
+	npcs_animal_protect[0].dialog_text.setWindow({w:canvas.width, h:canvas.height});
+	console.log("game progress:"+game_progress);
+	if(game_progress == 0){				//进度0，玩家刚刚进入游戏
+		npcs_animal_protect[0].dialog_text.setText(FRes.String.dialog2.dialog_1);
+		npcs_animal_protect[0].dialog_text.setCallFunc(function(){
+			stop_music();
+			flash_game_find.style.display = "";
+			game_pause = true;
+		});
+	}
+	else if(game_progress == 1)			//进度1，玩家没有完成测验
+	{
+		npcs_animal_protect[0].dialog_text.setText(FRes.String.dialog2.dialog_2);
+		npcs_animal_protect[0].dialog_text.setCallFunc(function(){
+			flash_game_find.style.display = "";
+			game_pause = true;
+		});
+	}
+	else if(game_progress >= 2)			//进度2，玩家已经完成了测验
+	{
+		npcs_animal_protect[0].dialog_text.setText(FRes.String.dialog2.dialog_5);
+		npcs_animal_protect[0].dialog_text.setCallFunc(function(){
+			
+		});
+	}
+	
 	scene_first_pass.enterScene(function(){
 		music_house.play();
 	});
@@ -452,6 +480,15 @@ function slaughter_house_map(){
 	for(var i = 0; i < npcs_slaughter.length; i ++)
 	{
 		map.add(npcs_slaughter[i]);
+	}
+	if(game_progress == 4)
+	{
+		npcs_slaughter[0].dialog_text.setText(FRes.String.dialog2.dialog_8);
+			npcs_slaughter[0].dialog_text.setCallFunc(function(){
+				npcs_slaughter[0].dialog_text.setText(FRes.String.dialog2.dialog_9);
+				npcs_slaughter[0].dialog_text.setCallFunc(function(){});
+				game_progress = 5;
+		});
 	}
 	npcs_slaughter[0].setPosition(750, 260);
 	map.addTransmitPoint({x:350, y:800, w:100, h:30, show:true});
@@ -519,6 +556,7 @@ function anduo_road_map(){					//前往安多县的地图
 		system_dialog.setText(FRes.String.dialog2.dialog_10);
 		system_dialog.visible = true;
 		system_dialog.setCallFunc(function(){
+			stop_music();
 			flash_game_car.style.display = "";
 			game_pause = true;
 		});
@@ -529,6 +567,7 @@ function anduo_road_map(){					//前往安多县的地图
 	map.setTransmitPointCallFunc(function(i){
 		if(i == 0){				//到达安多县
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				map.x = 200;
 				map.y = 0;
 				lead_first_pass.setPosition(1120, 600);
@@ -536,8 +575,9 @@ function anduo_road_map(){					//前往安多县的地图
 			});
 		}
 		else if(i == 1)			//到达拉萨
-		{
+		{			
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				map.x = 250;
 				map.y = 0;
 				lead_first_pass.setPosition(1190, 30);
@@ -545,7 +585,12 @@ function anduo_road_map(){					//前往安多县的地图
 			});
 		}
 	});
-	scene_first_pass.enterScene(function(){});
+	scene_first_pass.enterScene(function(){
+		if(game_progress != 5)
+		{
+			music_home_scene.play();
+		}
+	});
 }
 function anduo_map(){
 	current_scene = "anduo_map()";
@@ -613,6 +658,7 @@ function anduo_map(){
 		if(i == 0)									//到高速公路
 		{
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				map.x = 0;
 				map.y = 0;
 				lead_first_pass.setPosition(820, 50);
@@ -622,6 +668,7 @@ function anduo_map(){
 		else if(i == 11)							//到药店
 		{
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				map.x = 0;
 				map.y = 0;
 				lead_first_pass.setPosition(0,170);
@@ -631,6 +678,7 @@ function anduo_map(){
 		else if(i == 1)					//前往可可西里的路途
 		{
 			scene_first_pass.exitScene(function(){
+				stop_music();
 				map.x = 0;
 				map.y = 0;
 				lead_first_pass.setPosition(0, 280);
@@ -639,7 +687,9 @@ function anduo_map(){
 		}
 	});
 	
-	scene_first_pass.enterScene(function(){});
+	scene_first_pass.enterScene(function(){
+		music_home_scene.play();
+	});
 }
 function drugstore_map(){
 	place_name = "药店"
@@ -710,6 +760,7 @@ function kekexili_map(){
 		if(i == 0)
 		{
 			scene_first_pass.exitScene(function(){
+				stop_music();
 			//	lead_first_pass.setPosition(800, 100);
 				map.x = 200;
 				map.y = 0;
@@ -734,6 +785,7 @@ function kekexili_map(){
 			system_dialog.setText(FRes.String.dialog2.dialog_16);
 			system_dialog.visible = true;
 			system_dialog.setCallFunc(function(){				//到达进度10（听完犯罪分子的对话）
+				stop_music();
 				game_pause = true;
 				game_progress = 10;
 				flash_game_beng.style.display = "";
@@ -750,6 +802,7 @@ function kekexili_map(){
 			else
 			{
 				scene_first_pass.exitScene(function(){
+					stop_music();
 					///前往最后一个游戏关卡
 					lead_first_pass.setPosition(5*65, 55);
 					map.x = 0;//20*65-scene_first_pass.getWidth();
@@ -770,7 +823,9 @@ function kekexili_map(){
 	{
 		
 	}
-	scene_first_pass.enterScene(function(){});
+	scene_first_pass.enterScene(function(){
+		music_home_scene.play();
+	});
 }
 
 function FirstKeyDown(e){
@@ -822,6 +877,7 @@ function first_pass_draw(){
 			scene_first_pass.getContext().fillText(place_name, scene_first_pass.getCanvas().width-25*place_name.length, 0);
 			scene_first_pass.getContext().fillText(user_name, 140, 0);
 		}
+		scene_first_pass.getContext().fillText("得分："+(score1 + score2 + score3), 200, 0);
 		fps.frame();					//every frame call
 		scene_first_pass.getContext().font = "20px Arial";
 		scene_first_pass.getContext().fillText("fps:"+fps.getFps(), 0, 0);
