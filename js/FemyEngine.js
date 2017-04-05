@@ -502,7 +502,7 @@ function Fgame(){
 		this.render_list = new Array();
 		this.render_list_npc = new Array();				//npc渲染列表(不渲染，只用作逻辑处理)
 		this.render_list_npc_dialog_text = new Array();	//npc的对话框
-		this.render_lead = null;
+		this.render_lead = null;						//主角
 		//辅助开发
 		this.show_table_line = false;
 		//地图中的传送点
@@ -609,9 +609,9 @@ function Fgame(){
 						//	console.log("v:"+this.render_list_npc[i].visible);
 							this.is_dealwith_keydown = false;				//让其他的物体不能够处理当前事件
 						}
-						console.log("deal:"+this.is_dealwith_keydown);
-						console.log("npc show:"+this.render_list_npc[i].dialog_text.visible);
-						console.log("--------------");
+					//	console.log("deal:"+this.is_dealwith_keydown);
+					//	console.log("npc show:"+this.render_list_npc[i].dialog_text.visible);
+					//	console.log("--------------");
 					}
 				}
 			}
@@ -1054,11 +1054,11 @@ function Fgame(){
 						context.textBaseline = "top";
 						context.strokeRect(tx, ty, width, height);
 						context.fillText(this.map_data[i][j].f+"", tx + (width-20)/2, ty + (height-20)/2);
-					}				
+					}			
 				}
 			}
 			//绘制传送点
-			for(var i = 0; i < this.transmit_point.length; i ++)
+			for(var i = 0; i < this.transmit_point.length; i ++)       
 			{
 				//如果传送点的绘制标记变量标记为显示的话
 				if(this.transmit_point[i].show == true)
@@ -1195,11 +1195,14 @@ function Fgame(){
 						this.render_list[i].x -= this.render_list[i].vx;
 						this.render_list[i].y -= this.render_list[i].vy;
 					}
+					//做一个标记，如果主角走到了npc旁边则显示请按空格键按钮
+					var flag_is_npc = false;
 					//判断主角是否走到了npc旁边
 					for(var ni = 0; ni < this.render_list_npc.length; ni ++)
 					{
 						if(this.render_list[i].isNear(this.render_list_npc[ni]) == true)
 						{
+							flag_is_npc = true;
 							this.render_list_npc[ni].is_show_bubble = true;
 							//如果该角色存在AI，则暂停其AI(并且该角色存在对话)
 							if(this.render_list_npc[ni].ai_enable == true
@@ -1235,6 +1238,12 @@ function Fgame(){
 							this.render_list_npc[ni].is_show_bubble = false;
 						}
 					}
+					if(flag_is_npc == true)
+					{
+						this.render_list[i].is_fouces_npc = true;
+					}
+					else
+						this.render_list[i].is_fouces_npc = false;
 					//判断当前这个角色是不是主角
 					//if(this.render_list[i].is_lead && this.render_list[i].is_lead == true)
 					//{	
@@ -1259,10 +1268,11 @@ function Fgame(){
 									}
 									else
 									{
-										//	this.transmit_point_call_func(ti);
+										//this.transmit_point_call_func(ti);
+										//主角走到了传送点
 										this.is_fouces_transmit_point = true;
+										this.render_list[i].is_fouces_transmit_point = true;
 										this.transmit_point_index = ti;
-										
 									}
 								}
 								break;
@@ -1270,6 +1280,9 @@ function Fgame(){
 							else			//主角没有走到这个传送点上
 							{
 								this.transmit_point[ti].is_in = false;
+								//主角没有走到npc旁边
+								//if(flag_is_npc == false)
+								this.render_list[i].is_fouces_transmit_point = false;
 								this.is_fouces_transmit_point = false;
 							}
 						}
@@ -1292,6 +1305,10 @@ function Fgame(){
 						}
 					//}
 				//}
+			}
+			if(this.render_lead && this.is_fouces_transmit_point == true)
+			{
+				
 			}
 			//渲染npc对话框
 			for(var i = 0; i < this.render_list_npc_dialog_text.length; i ++)

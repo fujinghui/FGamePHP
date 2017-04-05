@@ -12,6 +12,7 @@
 		var $score1;
 		var $score2;
 		var $score3;
+		var $score4;
 	}
 	if(connectingDatabase())
 	{
@@ -32,6 +33,7 @@
 			$users[$index]->score1 = $row['score1'];
 			$users[$index]->score2 = $row['score2'];
 			$users[$index]->score3 = $row['score3'];
+			$users[$index]->score4 = $row['score4'];
 			
 			$index = $index + 1;
 		}
@@ -42,9 +44,9 @@
 		{
 			for(; $i < $index - 1; $i ++)
 			{
-				echo "{id:".$users[$i]->id.",name:'".$users[$i]->name."',score1:".$users[$i]->score1.",score2:".$users[$i]->score2.",score3:".$users[$i]->score3."},";		
+				echo "{id:".$users[$i]->id.",name:'".$users[$i]->name."',score1:".$users[$i]->score1.",score2:".$users[$i]->score2.",score3:".$users[$i]->score3.",score4:".$users[$i]->score4."},";		
 			}
-			echo "{id:".$users[$i]->id.",name:'".$users[$i]->name."',score1:".$users[$i]->score1.",score2:".$users[$i]->score2.",score3:".$users[$i]->score3."}";		
+			echo "{id:".$users[$i]->id.",name:'".$users[$i]->name."',score1:".$users[$i]->score1.",score2:".$users[$i]->score2.",score3:".$users[$i]->score3.",score4:".$users[$i]->score4."}";		
 		}
 		echo "]";	
 		closeDatabase();					//close database

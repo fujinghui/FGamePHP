@@ -36,8 +36,11 @@ var menu;
 var task;
 var ranklist;
 //音乐资源
+var music_enable = true;
 var music_hint, music_home_scene, music_house, music_tufu, music_beng;
 var musics = new Array();
+//图片资源
+var image_user_info_background;
 function init_all_res(){
 	myajax = new FAjax();
 	ranklist = new RankList();
@@ -59,35 +62,44 @@ function init_all_res(){
 	menu.SCENE_WIDTH = canvas.width;
 	menu.SCENE_HEIGHT = canvas.height;
 	menu.MENU_WIDTH = 200;
-	menu.MENU_HEIGHT = 440;
+	menu.MENU_HEIGHT = 500;
 	menu.x = (menu.SCENE_WIDTH-menu.MENU_WIDTH)/2;
 	menu.y = (menu.SCENE_HEIGHT-menu.MENU_HEIGHT)/2;
 	menu.init();
 	menu.visible = false;
 	//底下的菜单栏
 	menu_button[0] = new FGAMES.Button("菜单");
-	menu_button[0].setWidth(150);
-	menu_button[0].setHeight(50);
-	menu_button[0].setPosition(canvas.width - 150 - menu_button[0].getWidth() - 20, canvas.height - menu_button[0].getHeight());
+	menu_button[0].setWidth(100);
+	menu_button[0].setHeight(40);
+	menu_button[0].setPosition(canvas.width - menu_button[0].getWidth() * 3 - 20, canvas.height - menu_button[0].getHeight());
 	menu_button[0].setDefaultBackgroundImage('img/button1.png');
 	menu_button[0].setOnTouchBackgroundImage('img/button1_click.png');
 	menu_button[0].addOnClickListener(function(){
 		menu.visible = !menu.visible;
+		task.visible = false;
 	})
 	menu_button[1] = new FGAMES.Button("帮助");
-	menu_button[1].setWidth(150);
-	menu_button[1].setHeight(50);
-	menu_button[1].setPosition(canvas.width-menu_button[1].getWidth(), canvas.height - menu_button[1].getHeight());
-	menu_button[1].addOnClickListener(function(){
-	})
+	menu_button[1].setWidth(100);
+	menu_button[1].setHeight(40);
+	menu_button[1].setPosition(canvas.width-menu_button[1].getWidth()*2-10, canvas.height - menu_button[1].getHeight());
 	menu_button[1].setDefaultBackgroundImage('img/button1.png');
 	menu_button[1].setOnTouchBackgroundImage('img/button1_click.png');
 	menu_button[1].addOnClickListener(function(){
-		
 		task.text = FRes.String.help;
 		task.visible = true;
+		
+		menu.visible = false;
 	});
 	
+	menu_button[2] = new FGAMES.Button("游戏启示");
+	menu_button[2].setWidth(100);
+	menu_button[2].setHeight(40);
+	menu_button[2].setPosition(canvas.width-menu_button[2].getWidth(), canvas.height - menu_button[2].getHeight());
+	menu_button[2].setDefaultBackgroundImage('img/button1.png');
+	menu_button[2].setOnTouchBackgroundImage('img/button1_click.png');
+	menu_button[2].addOnClickListener(function(){
+		flash_game_prompt.style.display = "";
+	});
 	//系统对话框
 	system_dialog = new DialogText(null);
 	system_dialog.setWindow({w:canvas.width, h:canvas.height});
@@ -108,7 +120,7 @@ function init_all_res(){
 	*/
 	scoring = new Scoring(canvas.width, canvas.height);
 	
-	map_data_real_time_game=FTools.SetMapData({x:0,y:0,width:63,height:50,i:3,f:0},map_real_time);
+	map_data_real_time_game=FTools.SetMapData({x:0,y:0,width:120,height:120, i:5, f:1},map_real_time);
 	map_data_crime_house = FTools.SetMapData({x:0,y:0,width:63,height:50,i:3,f:0}, map_crime_test);
 	map_data_anduo_road = FTools.SetMapDataEx(map_flag_anduo_road,map_show_anduo_road,map_res_anduo_road);
 	map_data_anduo = FTools.SetMapDataEx(map_flag_anduo, map_show_anduo, map_res_anduo);
@@ -288,13 +300,13 @@ function init_all_res(){
 	houses[4].setWH(200, 160);
 	houses[4].center_x = 0; houses[4].center_y = 160;
 	houses[4].setPosition(980, 495);
-	houses[4].name = "肉贩市场";
+	//houses[4].name = "肉贩市场";
 	
 	//珍稀动物保护协会
 	houses[5] = new FGAMES.Character();
 	houses[5].init(['img/houses.png', 'img/china_animals_protect.png']);
 	houses[5].addFrame({i:0, x:525, y:0, width:520, height:380});
-	houses[5].addShowImage({i:1,sx:40,sy:33,sw:420,sh:138,dx:105,dy:-190,dw:100,dh:40});
+	houses[5].addShowImage({i:1,sx:40,sy:33,sw:420,sh:138,dx:95,dy:-200,dw:120,dh:50});
 	houses[5].setWH(300, 180);
 	houses[5].center_x = 0; houses[5].center_y = 180;
 	houses[5].setPosition(300, 390);
@@ -866,6 +878,9 @@ function init_all_res(){
 	musics[2] = music_house;
 	musics[3] = music_tufu;
 	
+	//初始化图片
+	image_user_info_background = new Image();
+	image_user_info_background.src = "img/user_info_background.png";
 	
 	npc_car = new Npc();
 	npc_car.init(['img/car.png']);
@@ -883,4 +898,9 @@ function stop_music(){
 		musics[i].pause();
 		musics[i].currentTime = 0;
 	}
+}
+function play_music(ss){
+	stop_music();
+	if(music_enable == true)
+		ss.play();
 }

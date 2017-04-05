@@ -17,7 +17,8 @@
 				$_SESSION['y'] = $row['y'];
 				$_SESSION['score1'] = $row['score1'];
 				$_SESSION['score2'] = $row['score2'];
-				$_SESSION['score3']  =$row['score3'];
+				$_SESSION['score3'] = $row['score3'];
+				$_SESSION['score4'] = $row['score4'];
 				$r = true;
 			}
 			closeDatabase();
@@ -31,8 +32,8 @@
 			$current_scene = "home_scene_map()";
 			$game_progress = 0;
 			$x = 0;$y = 530;	
-			$score1 = 0; $score2 = 0; $score3 = 0;
-			$sql = "insert into user(id, name, pwd, game_progress, current_scene, x, y, score1, score2, score3) values(null, '$name', '$pwd', $game_progress, '$current_scene', $x, $y, $score1, $score2, $score3)";
+			$score1 = 0; $score2 = 0; $score3 = 0; $score4 = 0;
+			$sql = "insert into user(id, name, pwd, game_progress, current_scene, x, y, score1, score2, score3, score4) values(null, '$name', '$pwd', $game_progress, '$current_scene', $x, $y, $score1, $score2, $score3,$score4)";
 			$result = mysql_query($sql);
 			if($result)
 			{
@@ -50,7 +51,8 @@
 					$_SESSION['y'] = $row['y'];
 					$_SESSION['score1'] = $row['score1'];
 					$_SESSION['score2'] = $row['score2'];
-					$_SESSION['score3']  =$row['score3'];
+					$_SESSION['score3'] = $row['score3'];
+					$_SESSION['score4'] = $row['score4'];
 					$r = true;
 				}
 			}

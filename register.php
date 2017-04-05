@@ -4,7 +4,7 @@
 	$name = $_POST['name'];
 	$pwd = $_POST['pwd'];
 	$confirm = $_POST['confirm_pwd'];
-	if(strcmp($name, $confirm) == 0)
+	if(strcmp($pwd, $confirm) == 0)
 	{
 		if(connectingDatabase()){
 			if(TestRegister($name, $confirm) == true){

@@ -30,4 +30,51 @@
 			$connecting_link = null;
 		}
 	}
+	function destory_database(){
+		if(connectingDatabase()){
+			$sql = "drop table user;";
+			$result = mysql_query($sql);
+			if($result)
+			{
+				echo "delete success!";
+			}
+			else
+			{
+				echo "falid";
+			}
+			closeDatabase();
+		}
+		
+	}
+	function init_database(){
+		if(connectingDatabase())
+		{
+			$sql = 
+			"CREATE TABLE `user`(
+			`id` int(8) not null auto_increment,
+			`name` varchar(20) unique not null,
+			`pwd` varchar(32) not null,
+			`game_progress` int(8),
+			`current_scene` varchar(64),
+			`x` int(8),
+			`y` int(8),
+			`score1` int(8),
+			`score2` int(8),
+			`score3` int(8),
+			`score4` int(8),
+			primary key(`id`)
+			)ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+			$result = mysql_query($sql);
+			if($result)
+			{
+				echo "success";
+			}
+			else
+			{
+				echo "faild";
+			}
+			closeDatabase();
+		}
+	}
+	
 ?>

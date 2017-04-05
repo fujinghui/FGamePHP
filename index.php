@@ -6,11 +6,40 @@
 <html>
 	<head>
 		<meta charset="utf-8" >
-		<title></title>
+		<title>救赎游戏</title>
 		<link href="css/bootstrap.min.css" rel="stylesheet" />
 		<style type="text/css" >
 			canvas{
 				cursor:'hand'
+			}
+			.modal-dialog-f {
+			    position: absolute; 
+			    top: 0; 
+			    bottom: 0; 
+			    left: 0; 
+			    right: 0; 
+			}
+			
+			.modal-content-f {
+			    /*overflow-y: scroll; */ 
+			    position: absolute; 
+			    top: 0; 
+			    bottom: 0; 
+			    width: 100%; 
+			}
+			.modal-body-f {
+			    overflow-y: scroll; 
+			    position: absolute; 
+			    top: 55px; 
+			    bottom: 65px; 
+			    width: 100%; 
+			}
+			.modal-header-f .close-f {margin-right: 15px;}
+			
+			.modal-footer-f {
+			    position: absolute; 
+			    width: 100%; 
+			    bottom: 0; 
 			}
 		</style>
 		<!--<script language="JavaScript" src="js/tools.js" ></script>-->
@@ -33,7 +62,9 @@
 		var scene_load;
 		var canvas_x, canvas_y = 0;
 		//flash游戏对象
-		var flash_game_find, flash_game_car, flash_game_beng;
+		var flash_game_find, flash_game_car, flash_game_beng, flash_game_end;
+		var flash_game_prompt;
+		var plot_hint;
 		var game_pause = false;
 		var is_login = false;				//是否登录
 		var user_name = "";
@@ -57,8 +88,8 @@
 			obj.setAttribute("aria-hidden", "false");
 			obj.style.display = "block";
 			
-		//	obj.aria-hidden = "false";
 		}
+		var flag_show = true;
 		function fmodal_close(id){
 			var obj = document.getElementById(id);
 			document.getElementById("main_body").setAttribute("class", " ");
@@ -66,10 +97,49 @@
 			obj.style.display = "none";
 			obj.setAttribute("aria-hidden","true");
 			$("#main_body").find("div").last().remove();
+			
+			if(lead_first_pass && flag_show == true&& game_progress == 0 && lead_first_pass.x == 0 && lead_first_pass.y == 530)
+			{
+				flag_show = false;
+				system_dialog.setText(FRes.String.dialog2.dialog_21);
+				system_dialog.visible = true;
+			}
 		}
 		function fmodal_transmit(resid, desid){
 			fmodal_close(resid);
 			fmodal_open(desid);
+		}
+		//关闭警示框
+		function game_prompt_close(){
+			flash_game_prompt.style.display = "none";
+		}
+		function game_end_close(){
+			flash_game_end.style.display = "none";
+		}
+		function set_plot_hint(){
+			var text = document.getElementById("plot_hint_text");
+			if(game_progress < 2)
+				text.innerHTML = FRes.String.plot_hint1;
+			else if(game_progress < 6)
+				text.innerHTML = FRes.String.plot_hint2;
+			else if(game_progress < 11)
+				text.innerHTML = FRes.String.plot_hint3;
+			else if(game_progress < 12)
+				text.innerHTML = FRes.String.plot_hint4;
+		}
+		function set_plot_hint_all(){
+			var text = document.getElementById("plot_hint_text");
+			text.innerHTML = FRes.String.plot_hintall;
+		}
+		//隐藏logo
+		function logo_hide(){
+			document.getElementById("logo_backward").style.display = "none";
+			document.getElementById("logo_forward").style.display = "none";
+		}
+		//显示logo
+		function logo_display(){
+			document.getElementById("logo_backward").style.display = "";
+			document.getElementById("logo_forward").style.display = "";
 		}
 		function load_from_server(){
 			//game_progress:
@@ -117,6 +187,7 @@
 					echo "score1=".$_SESSION['score1'].";\n";
 					echo "score2=".$_SESSION['score2'].";\n";
 					echo "score3=".$_SESSION['score3'].";\n";
+					echo "score4=".$_SESSION['score4'].";\n";
 					echo $_SESSION['current_scene'].";\n";
 				}
 			?>
@@ -171,6 +242,7 @@
 				//
 				npcs_animal_protect[0].dialog_text.text_index = -1;
 				npcs_animal_protect[0].dialog_text.setCallFunc(function(){
+					stop_music();
 					flash_game_find.style.display = "";
 					game_pause = true;
 				});
@@ -178,11 +250,10 @@
 			find_close_window();
 		}
 		function find_close_window(){
-			music_home_scene.play();
+			play_music(music_house);
 			game_pause = false;
 			flash_game_find.style.display = "none";
 		}
-		
 		function car_not_success(score){
 			map.x = 0;
 			map.y = 0;
@@ -220,7 +291,7 @@
 		function beng_not_faild(){
 			system_dialog.setText(FRes.String.dialog2.dialog_18);
 			system_dialog.visible = true;
-			system_dialog.setCallFunc(function(){	
+			system_dialog.setCallFunc(function(){
 				game_progress = 8;
 				scene_first_pass.exitScene(function(){
 					//lead_first_pass.setPosition(800, 100);
@@ -243,7 +314,6 @@
 			//var ss = [4, 3, 2, 5, 6, 1, 10, 9];
 			//sorts(ss, 0, ss.length - 1);
 			//console.log("result:"+ss);
-			
 			canvas = document.getElementById("my_canvas");
 			var bbpx = canvas.getBoundingClientRect();
 			canvas_x = bbpx.left;
@@ -255,6 +325,8 @@
 			flash_game_find = document.getElementById("flash_game_find");
 			flash_game_car = document.getElementById("flash_game_car");
 			flash_game_beng = document.getElementById("flash_game_beng");
+			flash_game_end = document.getElementById("flash_game_end");
+			flash_game_prompt = document.getElementById("flash_game_prompt");
 			
 			flash_game_find.style.left = ((canvas.width-flash_game_find.width)/2)+"px";
 			flash_game_find.style.top = ((canvas.height-flash_game_find.height)/2)+"px";
@@ -262,6 +334,18 @@
 			flash_game_car.style.top = ((canvas.height-flash_game_car.height)/2)+"px";
 			flash_game_beng.style.left = flash_game_find.style.left;
 			flash_game_beng.style.top = flash_game_find.style.top;
+			flash_game_end.style.left = ((canvas.width-flash_game_end.width)/2) + "px";
+			flash_game_end.style.top = ((canvas.height - flash_game_end.height)/2) + "px";
+			flash_game_prompt.style.left = ((canvas.width-flash_game_prompt.width)/2)+"px";
+			flash_game_prompt.style.top = ((canvas.height-flash_game_prompt.height)/2)+"px";
+
+			
+			//console.log(plot_hint.style.width);
+		//	plot_hint.style.left = ((canvas.width-400)/2)+"px";
+		//	plot_hint.style.top = ((canvas.height-400)/2)+"px";
+		//	fmodal_open("plot_hint");
+			
+			//flash_game_end.style.display = "";
 			//flash_game_find.style.display = "";
 			//显示flash
 			//flash_game_find.style.display = "";
@@ -541,6 +625,41 @@
 				path:'music/beng.mp3',
 				object:null
 			});
+			res.push({
+				type:FILE_TYPE_IMAGE,
+				path:'img/dimian.png',
+				object:null
+			});
+			res.push({
+				type:FILE_TYPE_IMAGE,
+				path:'img/user_info_background.png',
+				object:null
+			});
+			res.push({
+				type:FILE_TYPE_IMAGE,
+				path:'img/space.png',
+				object:null
+			});
+			res.push({
+				type:FILE_TYPE_IMAGE,
+				path:'img/ranklist_background.png',
+				object:null
+			});
+			res.push({
+				type:FILE_TYPE_IMAGE,
+				path:'img/ranklist.png',
+				object:null
+			});
+			res.push({
+				type:FILE_TYPE_IMAGE,
+				path:'img/dialog_background.png',
+				object:null
+			});
+			res.push({
+				type:FILE_TYPE_IMAGE,
+				path:'img/dialog_background_small.png',
+				object:null
+			});
 			
 			//res.push({
 			//	type:FILE_TYPE_SWF,
@@ -634,6 +753,9 @@
 			map.addImage(res[12].object);
 			map.addImage(res[13].object)
 			map.addImage(res[21].object);
+			var im = new Image();
+			im.src = "img/dimian.png";
+			map.addImage(im);
 			//map.setMapData(map_data_home1);
 			
 			
@@ -899,39 +1021,61 @@
 		</script>
 	</head>
 	<body id="main_body" style="background-color:#ccccff">
-		<div style="width:1024px;height:610px;margin:0 auto;cursor:default;position:relative;border:1px solid #00ff00">
+		<div style="width:1024px;height:610px;margin:0 auto;cursor:default;position:relative;border:0px solid #00ff00">
 			<canvas id="my_canvas" width="1024" height="600" style="background:#101010;border:1px solid #5a0;">
-				
 			</canvas>
 			
-		<img id="my_images" src="img/logo.gif" style="display:none"></img>
-		<object id="flash_game_find" style="display:none;position:absolute;left:0px;right:0px;" type="application/x-shockwave-flash" data="flash/find.swf" width="800" height="500">
-  			<param name="WMODE" value="transparent">
-		</object>
-		<object id="flash_game_car" style="display:none;position:absolute;left:0px;top:0px;" type="application/x-shockwave-flash" data="flash/car.swf" width="650" height="400">
-			<param name="WMODE" value="transparent">
-		</object>
-		<object id="flash_game_beng" style="display:none;position:absolute;" type="application/x-shockwave-flash" data="flash/beng.swf" width="800" height="500">
-			<param name="WMODE" value="transparent">
-		</object>
-		<object id="flash_game_test" style="display:none;position:absolute;left:10px;top:10px;" type="application/x-shockwave-flash" data="flash/test.swf" width="300" height="200">
+			<img id="my_images" src="img/logo.gif" style="display:none"></img>
+			<object id="flash_game_find" style="display:none;position:absolute;left:0px;right:0px;" type="application/x-shockwave-flash" data="flash/find.swf" width="800" height="500">
+  				<param name="WMODE" value="transparent">
+			</object>
+			<object id="flash_game_car" style="display:none;position:absolute;left:0px;top:0px;" type="application/x-shockwave-flash" data="flash/car.swf" width="650" height="400">
+				<param name="WMODE" value="transparent">
+			</object>
+			<object id="flash_game_beng" style="display:none;position:absolute;" type="application/x-shockwave-flash" data="flash/beng.swf" width="800" height="500">
+				<param name="WMODE" value="transparent">
+			</object>
+			<object id="flash_game_end" style="display:none;position:absolute;" type="application/x-shockwave-flash" data="flash/end.swf" width="1220" height="620">
+				<param name="WMODE" value="transparent">
+			</object>
+			<object id="flash_game_prompt" style="display:none;position:absolute;" type="application/x-shockwave-flash" data="flash/prompt.swf" width="1220" height="620">
+				<param name="WMODE" value="transparent">
+			</object>
+			<object id="flash_game_test" style="display:none;position:absolute;left:10px;top:10px;" type="application/x-shockwave-flash" data="flash/test.swf" width="300" height="200">
+			</object>
+			<object id="flash_game_test" style="display:'';position:absolute;left:10px;bottom:10px;" type="application/x-shockwave-flash" data="flash/copyright.swf" width="300" height="36">
+				<param name="WMODE" value="transparent">
+			</object>
 			
-		</object>
-		<object id="flash_game_test" style="display:'';position:absolute;left:10px;bottom:10px;" type="application/x-shockwave-flash" data="flash/copyright.swf" width="400" height="50">
-			<param name="WMODE" value="transparent">
-		</object>
+			
+			
+			<!--
+	        	作者：772725447@qq.com
+	        	时间：2017-04-03
+	        	描述：情节提示框
+	       
+			<div id="plot_hint" class="row pre-scrollable" width="400" height="400" style="font-size:25px;position:absolute;left:10px;top:10px;;width:400px;height:400px;border:1px solid #ff0">
+				faskfdhakjshffasdfadfadfadffasfasdfa
+				sfdkjafa
+				faksdjf
+				fdkajsfd
+				fdkjafs
+				
+				
+			</div>
+			-->
 		
-		<img src="img/logo_back.png" style="position:absolute;width:120;height:120px;left:0px;top:0px;"></img>
-		<img src="img/logo.gif" style="position:absolute;left:15px;top:15px;width:90px;height:90px;"></img>
+		<img id="logo_backward" src="img/logo_back.png" style="position:absolute;width:120;height:120px;left:-5px;top:20px;"></img>
+		<img id="logo_forward" src="img/logo.gif" style="position:absolute;left:10px;top:35px;width:90px;height:90px;"></img>
 		
-		<div style="overflow-y:auto;overflow-y:no;position:absolute;top:10px;right:-110px;width:100px;height:500px;border:1px solid #f00">
-		</div>
+		<!--<img src="img/logo2.png" style="position:absolute;width:120;height:120px;left:0px;top:0px;"></img>	
+		-->
 		</div>
 		<!-- 登录 -->
 		<div class="modal fade" id="login-modal" tabindex="-1" role="dialog"
 			aria-labelledby="modal-label" aria-hidden="false" >
 			<div class="modal-dialog" style="width:300px;">
-				<div class="modal-content" style="background:url(img/background_image.png)">
+				<div class="modal-content" style="background:url(img/login_register.png);background-size:cover;">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" onclick="fmodal_close('login-modal')">
 							<span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
@@ -942,7 +1086,9 @@
 						<form action="login.php" method="post" >
 							用户名：<input type="input" name="name" class="form-control" ></input><br /><br />
 							密&nbsp;&nbsp;&nbsp;码：<input type="password" name="pwd" class="form-control" ></input><br /><br  >
-							<input type="submit" class="btn btn-default" class="form-control" value="登录" style="width:220px;background:url(img/color4.bmp)"></input>
+							<div style="text-align: center;">
+								<input type="submit" class="btn btn-default" class="form-control" value="登录" style="width:220px;background:url(img/color4.bmp)"></input>
+							</div>
 						</form>
 					</div>
 					<div class="modal-footer">
@@ -954,11 +1100,12 @@
 				</div>
 			</div>
 		</div>
+		
 		<!--注册-->
 		<div class="modal fade" id="register-modal" tabindex="-1" role="dialog"
 			aria-labelledby="modal-label" aria-hidden="false">
 			<div class="modal-dialog" style="width:300px;" >
-				<div class="modal-content" style="background:url(img/background_image.png);background-size:cover;">
+				<div class="modal-content" style="background:url(img/login_register.png);background-size: cover;">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" onclick="fmodal_close('register-modal')">
 							<span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
@@ -970,7 +1117,9 @@
 							用&nbsp;户&nbsp;名：<input type="input" name="name" class="form-control"></input><br /><br />
 							密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：<input type="password" name="pwd" class="form-control" ></input><br /><br  >
 							确认密码：<input type="password" name="confirm_pwd"class="form-control"></input><br /><br />
-							<input type="submit" class="btn btn-default" class="btn btn-default" value="注册" style="width:220px;background:url(img/color4.bmp)"></input>
+							<div style="text-align: center;">
+								<input type="submit" class="btn btn-default" class="btn btn-default" value="注册" style="width:220px;background:url(img/color4.bmp)"></input>
+							</div>
 						</form>
 					</div>
 					<div class="modal-footer">
@@ -981,6 +1130,45 @@
 				</div>
 			</div>
 		</div>
+		
+		
+		<!--
+        	作者：772725447@qq.com
+        	时间：2017-04-03
+        	描述：用户情节提示框
+       -->
+		<div class="modal fade" id="plot_hint" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		    <div class="modal-dialog modal-dialog-f" >
+                                                      <!--
+                                                      	作者：772725447@qq.com
+                                                      	时间：2017-04-04
+                                                      	描述：background:#44DD66;height:400px;
+                                                      -->
+		        <div class="modal-content modal-content-f" style="height:400px;background:url(img/ranklist2.png);background-size: cover;">
+		            <div class="modal-header modal-header-f" style="font-weight: bold;">
+		                <button type="button" class="close" data-dismiss="modal" onclick="fmodal_close('plot_hint')">
+		                    <span aria-hidden="true">&times;</span><span class="sr-only"><sp:message code="sys.close" /></span>
+		                </button>
+		                <h4 class="modal-title" id="myModalLabel"><sp:message code="user.info"/>本关剧情提示：<sp:message code="sys.edit"/></h4>
+		            </div>
+		
+		            <div class="modal-body modal-body-f" >
+		                    <div class="form-group" style="font-size:25px;" id="plot_hint_text">
+
+
+		                    </div>
+		            </div>
+		            <!-- modal-body END -->
+		            <div class="modal-footer modal-footer-f">
+		            	<a id="" type="" class="btn btn-primary" onclick="set_plot_hint_all()">所有剧情</a>
+		            	<button id="" type="" class="btn btn-primary" onclick="set_plot_hint()">当前剧情</button>
+		                <button id="btn-submit" type="submit" class="btn btn-primary" onclick="fmodal_close('plot_hint')"><sp:message code="sys.submit"/>确定</button>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+		
+		
 		<!-- <p><a data-toggle="modal" href="#login-modal" class="btn btn-primary btn-large">发动演示模态框</a></p> 
 		-->
 		<script language="javascript">

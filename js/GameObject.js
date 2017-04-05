@@ -262,9 +262,9 @@ function Task(){
 	
 	this.init = function(){
 		this.button[0] = new FGAMES.Button("确定");
-		this.button[0].setWidth(this.w-20);
+		this.button[0].setWidth(this.w-100);
 		this.button[0].setHeight(40);
-		this.button[0].setPosition(this.x + (this.w-this.button[0].getWidth())/2, this.y + this.h-this.button[0].getHeight());
+		this.button[0].setPosition(this.x + (this.w-this.button[0].getWidth())/2, this.y + this.h-this.button[0].getHeight()-10);
 		this.button[0].setDefaultBackgroundImage("img/button1.png");
 		this.button[0].setOnTouchBackgroundImage("img/button1_click.png");
 		
@@ -274,7 +274,7 @@ function Task(){
 		});
 		
 		this.image_background = new Image();
-		this.image_background.src = "img/dialog_text_background.png";
+		this.image_background.src = "img/ranklist.png";
 	}
 	this.Constructor = function(){
 		return this.button;
@@ -291,26 +291,28 @@ function Task(){
 			context.drawImage(this.image_background,
 				0, 0, this.image_background.width, this.image_background.height,
 				this.x, this.y, this.w, this.h);
-			context.fillStyle = "rgb(200, 200, 100)";
-			context.font = "italic "+this.fontsize+"px arial,sans-serif";
+			context.fillStyle = "rgb(0, 0, 0)";
+			//context.font = "italic "+this.fontsize+"px arial,sans-serif";
+			context.font = "bold "+this.fontsize+"px KaiTi,sans-serif";
 			var t;
 			if(this.text == null)
 				t = this.task_list[this.task_progress].describe;
 			else
 				t = this.text;
 			//一行可以容纳的字
-			var line_count = Math.round(this.w/this.fontsize-1.0);
-			var yy = 0;
+			var line_count = Math.round(this.w/this.fontsize-2.0);
+			var yy = 10;
+			var xx = 20;
 			while(t.length > line_count)
 			{
 				var tt = t.substr(0, line_count);
-				context.fillText(tt, this.x, this.y+yy);
+				context.fillText(tt, this.x + xx, this.y+yy);
 				t = t.substr(line_count, t.length);
 				yy += this.fontsize;
 			}
 			if(t.length > 0)
 			{
-				context.fillText(t, this.x, this.y + yy);
+				context.fillText(t, this.x + xx, this.y + yy);
 			}
 			
 			//设置按钮可见
@@ -404,7 +406,7 @@ function DialogText(obj){
 		if(this.image_background == null)
 		{
 			this.image_background = new Image();
-			this.image_background.src = "img/dialog_text_background.png";
+			this.image_background.src = "img/dialog_background.png";
 		}
 	}
 	this.getType = function(){
@@ -573,7 +575,7 @@ function DialogText(obj){
 		else
 			context.fillRect(this.x, this.y, this.w, this.h);
 		//this.drawRotateRect(context, this.x, this.y, this.w, this.h, 30);
-		context.fillStyle = "rgb(255, 255, 255)";
+		context.fillStyle = "rgb(0, 0, 0)";
 		
 		//context.font = (this.fontsize+10) + "px Arial";
 		context.font = "bold "+(this.fontsize+10)+"px KaiTi,sans-serif";
@@ -581,19 +583,21 @@ function DialogText(obj){
 		
 		//context.font = "bold "+this.fontsize+"px STKaiti,sans-serif";
 		context.font = "bold "+this.fontsize+"px KaiTi,sans-serif";
+		var xx = 10;
+		var yy = 10;
 		if(this.text.length * this.fontsize > this.w)
 		{
-			var count = Math.round(this.text.length * this.fontsize / (this.w - this.fontsize) + 0.5);
+			var count = Math.round(this.text.length * this.fontsize / (this.w - this.fontsize * 2) + 0.5);
 			var s = Math.round((this.w-this.fontsize) / this.fontsize);
 			for(var i = 0; i < count;  i ++)
 			{
 				var t = this.text.substr(i * s, s);
-				context.fillText(t, this.x, this.y + this.fontsize * i);
+				context.fillText(t, this.x + xx, this.y + yy + this.fontsize * i);
 			}
 		}
 		else
 		{
-			context.fillText(this.text, this.x, this.y);
+			context.fillText(this.text, this.x+xx, this.y+yy);
 		}
 	}
 }
@@ -612,7 +616,6 @@ function TransmitPoint(){
 	this.draw = function(context){
 		if(this.visible == false)
 			return;
-		//console.log("fafd");
 		this.cx = this.x + this.width/2;
 		this.cy = this.y + this.height/2;
 		if(this.image)
@@ -1230,8 +1233,58 @@ function LeadCharacter(){
 	
 	this.pdraw = this.draw;
 	this.tussle = null;
+	this.is_fouces_transmit_point = false;
+	this.is_fouces_npc = false;
+	var img_back = new Image();
+	img_back.src = "img/user_info_background.png";
+	var img_space = new Image();
+	img_space.src = "img/space.png";
+	var space_width = 80, space_height = 20;
+	var move_dx = -0.8;
+	this.fontsize = 20;
 	this.draw = function(context){
 		this.pdraw(context);
+		//主角走到了传送点
+		if(this.is_fouces_transmit_point == true)
+		{
+			context.textBaseline = "top";
+			context.font = "bold "+(this.fontsize)+"px KaiTi,sans-serif";
+			context.drawImage(img_back, 0, 0, img_back.width, img_back.height, this.x+(this.getWidth()-80)/2-this.fontsize*2-10, this.y - this.getHeight()-20-20/2-10, this.fontsize*3+80+20, 40);
+			context.fillStyle = "rgb(0, 0, 0)";
+			context.fillText("请按", this.x+(this.getWidth()-80)/2-this.fontsize*2, this.y-this.getHeight()-20-20/2);
+			context.drawImage(img_space, 0, 0, img_space.width, img_space.height, this.x + (this.getWidth()-space_width)/2, this.y-this.getHeight()-20-20/2, space_width, 20);
+			context.fillText("键", this.x+(this.getWidth()-80)/2+80, this.y-this.getHeight()-20-20/2);
+			//context.fillText("fadf", 0, 0);
+			if(space_width < 70)
+			{
+				space_width = 70;
+				move_dx = 0.8;
+			}
+			if(space_width > 80)
+			{
+				space_width = 80;
+				move_dx = -0.8;
+			}
+			space_width += move_dx;
+			space_height += move_dx/2;
+		}
+		//主角走到了npc旁边
+		else if(this.is_fouces_npc == true)
+		{
+			context.drawImage(img_space, 0, 0, img_space.width, img_space.height, this.x + (this.getWidth()-space_width)/2, this.y-this.getHeight()-20-20/2, space_width, 20);
+			if(space_width < 70)
+			{
+				space_width = 70;
+				move_dx = 0.8;
+			}
+			if(space_width > 80)
+			{
+				space_width = 80;
+				move_dx = -0.8;
+			}
+			space_width += move_dx;
+			space_height += move_dx/2;
+		}
 		if(this.tussle)
 			this.tussle.draw(context);
 	}
@@ -1296,7 +1349,7 @@ function MiniMap(){
 	this.draw = function(context){
 		this.sx = this.SCENE_WIDTH-this.MINI_MAP_WIDTH;
 		this.sy = 0;
-		context.fillStyle = "rgba(50, 200, 30, 0.5)";
+		context.fillStyle = "rgba(60, 160, 70, 0.5)";
 		context.fillRect(this.sx, this.sy, this.MINI_MAP_WIDTH, this.MINI_MAP_HEIGHT);
 		if(this.map_data)
 		{
@@ -1309,7 +1362,9 @@ function MiniMap(){
 				{
 					if(this.map_data[i][j].f == 1)
 					{
-						context.fillStyle = "rgb(45,50,70)";
+						//context.fillStyle = "rgb(45,50,70)";
+						context.fillStyle = "rgb(24, 30, 20)";
+						//context.fillStyle = "rgb(255, 255, 255)";
 						context.fillRect(this.sx+mw*j,this.sy+mh*i,mw,mh);
 					}
 				}
@@ -1317,11 +1372,11 @@ function MiniMap(){
 			//在小地图上绘制出主角的位置
 			if(this.leader)
 			{
-				context.fillStyle = "rgb(200, 50, 50)";
+				context.fillStyle = "rgb(100, 250, 50)";
 				context.fillRect(this.sx+this.leader.x*this.MINI_MAP_WIDTH/map.getWidth(),this.sy+this.leader.y*this.MINI_MAP_HEIGHT/map.getHeight()-mh/2,mw,mh);
 			}
 			//在小地图上绘制出犯罪分子的位置
-			context.fillStyle = "rgb(20, 40, 200)";
+			context.fillStyle = "rgb(255, 100, 100)";
 			for(var i = 0; i < this.npcs_crimes.length; i ++)
 			{
 				//绘制会有死亡的npcs
@@ -1329,7 +1384,7 @@ function MiniMap(){
 				context.fillRect(this.sx+this.npcs_crimes[i].x*this.MINI_MAP_WIDTH/map.getWidth(), this.sy+this.npcs_crimes[i].y*this.MINI_MAP_HEIGHT/map.getHeight(), mw, mh);
 			}
 			//在小地图上绘制出要解救的动物的位置
-			context.fillStyle = "rgb(200, 200, 20)";
+			context.fillStyle = "rgb(255, 250, 100)";
 			for(var i = 0; i < this.npcs_animals.length; i ++)
 			{
 				context.fillRect(this.sx+this.npcs_animals[i].x*this.MINI_MAP_WIDTH/map.getWidth(), this.sy+this.npcs_animals[i].y*this.MINI_MAP_HEIGHT/map.getHeight(), mw, mh);
@@ -1346,12 +1401,17 @@ function Scoring(width,height){
 	this.kill_enemy_count = 0;					//杀死的敌人数量
 	this.screen_width = width;
 	this.screen_height = height;
+	var img_back = new Image();
+	img_back.src = "img/user_info_background.png";
 	this.draw = function(context){
-		context.fillStyle = "rgb(255, 255, 255)";
+		context.fillStyle = "rgb(0, 0, 0)";
 		context.font = "25px Arial";
 		context.textBaseline = "top";
-		context.fillText(FRes.String.scoring1+this.kill_enemy_count, 520, 5);
-		context.fillText(FRes.String.scoring2+this.save_animal_count, 520, 10+25);
+		context.drawImage(img_back, 0, 0, img_back.width, img_back.height, 
+			480, -25, 290, 120
+		);
+		context.fillText(FRes.String.scoring1+this.kill_enemy_count, 510, 5);
+		context.fillText(FRes.String.scoring2+this.save_animal_count, 510, 10+25);
 	}
 }
 
@@ -1365,7 +1425,7 @@ function RankList(){
 	this.image_background; 
 	this.visible = false;
 	this.fontsize = 25;
-	this.show_count = 8;
+	this.show_count = 7;
 	this.init = function(){
 		this.button[0] = new FGAMES.Button("确定");
 		for(var i = 0; i < this.button.length; i ++)
@@ -1375,27 +1435,35 @@ function RankList(){
 			this.button[i].setDefaultBackgroundImage("img/button1.png");
 			this.button[i].setOnTouchBackgroundImage("img/button1_click.png");
 		}
-		this.button[0].setPosition(this.x+(this.w-this.button[0].getWidth())/2, this.y+this.h-this.button[0].getHeight());
+		this.button[0].setPosition(this.x+(this.w-this.button[0].getWidth())/2, this.y+this.h-this.button[0].getHeight()-10);
 		this.button[0].addOnClickListener(function(){
 			ranklist.visible = false;
 		});
 		
 		this.image_background = new Image();
-		this.image_background.src = "img/dialog_text_background.png";
+		this.image_background.src = "img/ranklist.png";
+	}
+	this.reset = function(){
+		this.x = (canvas.width - this.w)/2;
+		this.y = (canvas.height - this.h)/2;
+		this.button[0].setPosition(this.x+(this.w-this.button[0].getWidth())/2, this.y+this.h-this.button[0].getHeight()-10);
+
 	}
 	this.draw = function(context){
 		if(this.visible == true)
 		{
 			context.font = this.fontsize+"px Arial";
-			context.fillStyle = "rgb(0, 0, 0)";
+			context.fillStyle = "rgb(255, 0, 0)";
 			context.drawImage(this.image_background, 0, 0, this.image_background.width, this.image_background.height,
 				this.x, this.y, this.w, this.h
 			);
 			var text = "";
-			var yy = 20, xx = 10;
+			var yy = 20, xx = 10 + this.w / 8;
 			context.fillText("用户名", this.x + xx, this.y + yy);
 			context.fillText("得分", this.x + xx + this.w/2, this.y + yy);
 			yy += this.fontsize;
+			
+			context.fillStyle = "rgb(0, 0, 0)";
 			for(var i = 0; i < this.play_info.length && i < this.show_count; i ++)
 			{
 				context.fillText(this.play_info[i].name, this.x + xx, this.y + yy);
@@ -1410,7 +1478,7 @@ function RankList(){
 			for(var i = 0; i < this.button.length; i ++)
 				this.button[i].visible = false;
 		}
-	}	
+	}
 	
 	this.Constructor = function(){
 		
@@ -1449,15 +1517,16 @@ function Menu(){
 		return this.button;
 	}
 	this.init = function(){
-		this.button[0] = new FGAMES.Button("任务");
-		this.button[1] = new FGAMES.Button("排行榜");
+		this.button[0] = new FGAMES.Button("当前剧情");
+		this.button[1] = new FGAMES.Button("任务");
+		this.button[2] = new FGAMES.Button("排行榜");
 		
-		this.button[2] = new FGAMES.Button("音效（开）");
-		this.button[2].enable_music = true;
-		this.button[3] = new FGAMES.Button("保存游戏");
-		this.button[4] = new FGAMES.Button("新的游戏");
+		this.button[3] = new FGAMES.Button("音效（关）");
+		this.button[3].enable_music = true;
+		this.button[4] = new FGAMES.Button("保存游戏");
+		this.button[5] = new FGAMES.Button("新的游戏");
 		
-		this.button[5] = new FGAMES.Button("退出游戏");
+		this.button[6] = new FGAMES.Button("退出游戏");
 		
 		for(var i = 0; i < this.button.length; i ++)
 		{
@@ -1465,7 +1534,7 @@ function Menu(){
 			this.button[i].setHeight(60);
 			this.button[i].setPosition(this.x+(this.MENU_WIDTH-this.button[i].getWidth())/2, 20+this.y + i*(this.button[i].getHeight()+10));	
 			this.button[i].visible = false;
-			if(i == 2)
+			if(i == 3)
 			{
 				this.button[i].setDefaultBackgroundImage('img/button2.png');
 				this.button[i].setOnTouchBackgroundImage('img/button2_click.png');
@@ -1476,15 +1545,19 @@ function Menu(){
 				this.button[i].setOnTouchBackgroundImage('img/button1_click.png');
 			}
 		}
-		
 		this.button[0].addOnClickListener(function(){
+			set_plot_hint();
+			menu.visible = false;
+			fmodal_open("plot_hint");
+		});
+		this.button[1].addOnClickListener(function(){
 			menu.visible = false;
 			task.visible = true;
 			task.task_progress = game_progress;
 		});
 	//	this.button[1].setDefaultBackgroundColor(255,255,255);
 	//	this.button[1].setOnTouchBackgroundColor(255,255,0);
-		this.button[1].addOnClickListener(function(e){
+		this.button[2].addOnClickListener(function(e){
 			menu.visible = false;
 			ranklist.visible = true;
 			ranklist.play_info = 0;			//暂无数据
@@ -1493,12 +1566,22 @@ function Menu(){
 				null,
 				function(text){
 					eval("data="+text);
-					console.log(data);
+					//console.log(data);
 					
 					ranklist.play_info= data;
+					var max_width = 0;
 					for(var i = 0; i < ranklist.play_info.length; i ++)
 					{
 						ranklist.play_info[i].score = ranklist.play_info[i].score1 + ranklist.play_info[i].score2 + ranklist.play_info[i].score3;
+						//找出最长的用户名的长度
+						if(ranklist.play_info[i].name.length > max_width)
+							max_width = ranklist.play_info[i].name.length;
+						
+					}
+					//根据用户名的长度重新设置框的宽高
+					if(max_width > 4)
+					{
+						ranklist.w = max_width * ranklist.fontsize + 150;
 					}
 					for(var i = 0; i < ranklist.play_info.length; i ++)
 					{
@@ -1511,36 +1594,43 @@ function Menu(){
 								var t = ranklist.play_info[j];
 								ranklist.play_info[j] = ranklist.play_info[j + 1];
 								ranklist.play_info[j + 1] = t;
+
 							}
 						}
+						
 					}
 					for(var i = 0; i < ranklist.play_info.length; i ++)
 					{
 						console.log(ranklist.play_info[i]);
 					}
+					ranklist.reset();			//重新设置按钮位置
 				}
 			);
 		});
-		this.button[2].addOnClickListener(function(e){
+		this.button[3].addOnClickListener(function(e){
 		//	console.log(menu.button[1].enable_music);
-			if(menu.button[2].enable_music == true)
+			if(menu.button[3].enable_music == true)
 			{
-				menu.button[2].setText("音效（关）");
-				menu.button[2].enable_music = false;
+				music_enable = true;
+				play_music(music_home_scene);
+				menu.button[3].setText("音效（关）");
+				menu.button[3].enable_music = false;
 			}
 			else
 			{
-				menu.button[2].setText("音效（开）");
-				menu.button[2].enable_music = true;
+				music_enable = false;
+				stop_music();
+				menu.button[3].setText("音效（开）");
+				menu.button[3].enable_music = true;
 			}
 		});
 		//保存游戏
-		this.button[3].addOnClickListener(function(e){
+		this.button[4].addOnClickListener(function(e){
 			myajax.reader(
 			"save_game.php",
 			"game_progress="+game_progress+"&current_scene="+current_scene+
 			"&x="+(map.x*10000+lead_first_pass.x)+"&y="+(map.y*10000+lead_first_pass.y)+
-			"&score1="+score1+"&score2="+score2+"&score3="+score3,
+			"&score1="+score1+"&score2="+score2+"&score3="+score3+"&score4="+score4,
 			function(text){
 				if(text == "success")
 					alert("保存成功！");
@@ -1549,7 +1639,7 @@ function Menu(){
 			});
 		});
 		//新的游戏
-		this.button[4].addOnClickListener(function(e){
+		this.button[5].addOnClickListener(function(e){
 			if(confirm("开始新的游戏后之前的游戏数据将消失，确定要重新开始吗？") == true)
 			myajax.reader(
 				"new_game.php",
@@ -1563,7 +1653,15 @@ function Menu(){
 							score1 = 0;
 							score2 = 0;
 							score3 = 0;
+							score4 = 0;
+							map.x = 0;
+							map.y = 0;
 							game_progress = 0;
+							//删除最后一关相关的内容
+							scene_first_pass.removeObject(mini_map);
+							scene_first_pass.removeObject(scoring);
+							lead_first_pass.tussle = null;
+							
 							lead_first_pass.setPosition(0, 530);
 							home_scene_map();
 						});
@@ -1577,7 +1675,7 @@ function Menu(){
 			
 		});
 		//退出游戏
-		this.button[5].addOnClickListener(function(e){
+		this.button[6].addOnClickListener(function(e){
 			myajax.reader("logout.php",null,function(text){
 				window.location.href="index.php";
 			});

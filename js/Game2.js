@@ -10,7 +10,7 @@ function real_time_game_map(){
 	map.show_table_line = false;
 	//往地图里添加对象
 	map.add(lead_first_pass);
-
+	
 	//添加障碍物
 	for(var i = 0; i < stones.length; i ++)
 		map.add(stones[i]);
@@ -22,6 +22,11 @@ function real_time_game_map(){
 		{
 			if(game_progress != 11)
 			scene_first_pass.exitScene(function(){
+				logo_display();
+				//移除当前场景里的一些（场景）对象
+				scene_first_pass.removeObject(mini_map);
+				scene_first_pass.removeObject(scoring);
+				lead_first_pass.tussle = null;
 				map.x = 0;
 				map.y = 80;
 				lead_first_pass.setPosition(920, 650);
@@ -33,12 +38,15 @@ function real_time_game_map(){
 			//所有敌人都已经杀死
 			if(scoring.save_animal_count == 3&&
 			scoring.kill_enemy_count == 3)
-			{
+			{				
+				//移除当前场景里的一些（场景）对象
+				scene_first_pass.removeObject(mini_map);
+				scene_first_pass.removeObject(scoring);
 				//玩家完成了游戏，进入到主界面
 				scene_first_pass.exitScene(function(){
 						map.x = 0;
 						map.y = 0;
-						
+						logo_display();
 						//移除当前场景里的一些（场景）对象
 						scene_first_pass.removeObject(mini_map);
 						scene_first_pass.removeObject(scoring);
@@ -130,24 +138,28 @@ function real_time_game_map(){
 			mini_map.remove(this.parent);
 			if(scoring.save_animal_count == npcs_animals_save.length)
 			{
-				game_progress == 12;									//到达游戏进度12
+				//设置第四关得分(根据)
+				score4 = lead_first_pass.tussle.health_point;
+				//console.log(score4);
+				game_progress = 12;									//到达游戏进度12
 				system_dialog.setText(FRes.String.dialog2.dialog_end);
 				system_dialog.visible = true;
 				system_dialog.setCallFunc(function(){
 					//玩家完成了游戏，进入到主界面
-					scene_first_pass.exitScene(function(){
-						map.x = 0;
-						map.y = 0;
-						stop_music();
-						//移除当前场景里的一些（场景）对象
-						scene_first_pass.removeObject(mini_map);
-						scene_first_pass.removeObject(scoring);
-						scene_first_pass.exitScene(function(){
-							lead_first_pass.tussle = null;			//删除打斗类
-							lead_first_pass.setPosition(0, 530);
-							home_scene_map();
-						});
-					});
+					//	map.x = 0;
+					//	map.y = 0;
+					//stop_music();
+					flash_game_end.style.display = "";
+					lead_first_pass.tussle = null;
+				//	scene_first_pass.exitScene(function(){
+						
+					//	scene_first_pass.exitScene(function(){
+					//		lead_first_pass.tussle = null;			//删除打斗类
+					//		lead_first_pass.setPosition(0, 530);
+							//home_scene_map();
+					//		console.log(flash_game_end);
+					//	});
+				//	});
 				});
 			}
 		});
@@ -155,7 +167,8 @@ function real_time_game_map(){
 	
 	real_time_npc_ai_init();
 	scene_first_pass.enterScene(function(){
-		music_home_scene.play();
+		play_music(music_home_scene);
+		logo_hide();					//隐藏logo
 	});
 }
 

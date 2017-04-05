@@ -7,8 +7,12 @@
 	if($state)			//登录成功
 	{
 		$_SESSION['login_state'] = 1;
-		
+		echo "<script>window.location.href='index.php';</script>";
 	}
-	echo $state;
-	header("location:index.php");
+	else
+	{
+		echo "<script>alert('用户名或密码错误！');window.location.href='index.php';</script>";
+	}
+	//echo $state;
+	//header("location:index.php");
 ?>

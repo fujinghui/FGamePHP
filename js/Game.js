@@ -343,8 +343,14 @@ function home_scene_map(){
 		
 	}
 	scene_first_pass.enterScene(function(){
-		
-		music_home_scene.play();
+		play_music(music_home_scene);
+		//初次进入游戏
+		console.log(game_progress+ " "+lead_first_pass.x + " "+lead_first_pass.y);
+		if(game_progress == 0 && lead_first_pass.x == 0 && lead_first_pass.y == 530)
+		{
+			set_plot_hint();
+			fmodal_open("plot_hint");
+		}
 	});
 }
 //中国野生动物保护协会的房内地图资源
@@ -371,7 +377,7 @@ function animal_protect_house_map(){
 					system_dialog.setText(FRes.String.dialog_system.dialog_1);
 					system_dialog.visible = true;
 					game_progress = 3;		//到进度3
-					music_hint.play();
+					play_music(music_hint);
 				}
 				home_scene_map();
 			});
@@ -439,7 +445,7 @@ function animal_protect_house_map(){
 	}
 	
 	scene_first_pass.enterScene(function(){
-		music_house.play();
+		play_music(music_house);
 	});
 }
 
@@ -503,7 +509,7 @@ function slaughter_house_map(){
 	});
 	
 	scene_first_pass.enterScene(function(){
-		music_tufu.play();
+		play_music(music_tufu);
 	});
 }
 
@@ -588,7 +594,7 @@ function anduo_road_map(){					//前往安多县的地图
 	scene_first_pass.enterScene(function(){
 		if(game_progress != 5)
 		{
-			music_home_scene.play();
+			play_music(music_home_scene);
 		}
 	});
 }
@@ -688,7 +694,7 @@ function anduo_map(){
 	});
 	
 	scene_first_pass.enterScene(function(){
-		music_home_scene.play();
+		play_music(music_home_scene);
 	});
 }
 function drugstore_map(){
@@ -824,7 +830,7 @@ function kekexili_map(){
 		
 	}
 	scene_first_pass.enterScene(function(){
-		music_home_scene.play();
+		play_music(music_home_scene);
 	});
 }
 
@@ -868,19 +874,50 @@ function FirstKeyUp(e){
 function first_pass_draw(){
 	if(game_pause == false)
 	{
+		var score_current = 0;
+		
+		var user_info = 0;
+		if(game_progress >= 12)
+			score_current = score4;
+		else if(game_progress >= 11)
+			score_current = score3;
+		else if(game_progress >= 6)
+			score_current = score2;
+		else
+			score_current = score1;
+		
+	//	user_info = user_name+" "+"上一关得分："+(score1+score2+score3);
+		user_info = user_name + " "+"上一关得分："+score_current;
 		scene_first_pass.render();
+		scene_first_pass.getContext().textBaseline = "top";
+		scene_first_pass.getContext().font = "bold 25px KaiTi,sans-serif";
+		scene_first_pass.getContext().fillStyle = "rgba(255, 255, 255, 0.5)";
+		
+		var width = scene_first_pass.getContext().measureText(user_info).width + 40;
+		//scene_first_pass.getContext().fillRect(130, 0, width, 30);
+		//绘制背景
+		scene_first_pass.getContext().drawImage(image_user_info_background,
+			0, 0, image_user_info_background.width, image_user_info_background.height,
+			0, -15, width, 60);
+		scene_first_pass.getContext().fillStyle = "rgb(0, 0, 0)";
+		
+		scene_first_pass.getContext().fillText(user_info, 20, 0);
+		
 		if(place_name)
 		{
-			scene_first_pass.getContext().fillStyle = "rgb(0, 0, 0)";
-			scene_first_pass.getContext().font = "25px Arial";
-			scene_first_pass.getContext().textBaseline = "top";
-			scene_first_pass.getContext().fillText(place_name, scene_first_pass.getCanvas().width-25*place_name.length, 0);
-			scene_first_pass.getContext().fillText(user_name, 140, 0);
+			width = scene_first_pass.getContext().measureText(place_name).width + 50;
+			scene_first_pass.getContext().drawImage(image_user_info_background,
+			0, 0, image_user_info_background.width, image_user_info_background.height,
+			scene_first_pass.getCanvas().width - width, -15, width, 70
+			);
+			
+			scene_first_pass.getContext().fillText(place_name, scene_first_pass.getCanvas().width-25*place_name.length-30, 8);
 		}
-		scene_first_pass.getContext().fillText("得分："+(score1 + score2 + score3), 200, 0);
+		//scene_first_pass.getContext().fillText(user_name, 140, 0);
+		//scene_first_pass.getContext().fillText("得分："+(score1 + score2 + score3), 200, 0);
 		fps.frame();					//every frame call
 		scene_first_pass.getContext().font = "20px Arial";
-		scene_first_pass.getContext().fillText("fps:"+fps.getFps(), 0, 0);
+		//scene_first_pass.getContext().fillText("fps:"+fps.getFps(), 0, 0);
 	//	console.log("game progress:"+game_progress);
 	}
 	requestAnimationFrame(first_pass_draw);
